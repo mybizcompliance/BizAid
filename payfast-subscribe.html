@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Subscribe with PayFast</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Activating Your Subscription</h1>
+    <p>Redirecting you to PayFast…</p>
+
+    <form id="payfastForm" action="https://www.payfast.co.za/eng/process" method="post">
+
+        <!-- REQUIRED PAYFAST FIELDS -->
+        <input type="hidden" name="merchant_id" value="YOUR_MERCHANT_ID">
+        <input type="hidden" name="merchant_key" value="YOUR_MERCHANT_KEY">
+
+        <!-- SUBSCRIPTION INFO -->
+        <input type="hidden" name="item_name" value="Bizaid Compliance Subscription">
+        <input type="hidden" name="amount" value="49.00">
+
+        <!-- RECURRING BILLING -->
+        <input type="hidden" name="subscription_type" value="1">
+        <input type="hidden" name="billing_date" value="2025-01-01">
+        <input type="hidden" name="recurring_amount" value="49.00">
+        <input type="hidden" name="frequency" value="3"> <!-- Monthly -->
+        <input type="hidden" name="cycles" value="0"> <!-- Infinite -->
+
+        <!-- REDIRECT URLS -->
+        <input type="hidden" name="return_url" value="https://yourwebsite.com/success.html">
+        <input type="hidden" name="cancel_url" value="https://yourwebsite.com/cancel.html">
+        <input type="hidden" name="notify_url" value="https://yourwebsite.com/payfast-notify.php">
+
+    </form>
+
+    <script>
+        document.getElementById('payfastForm').submit();
+    </script>
+</div>
+</body>
+</html>

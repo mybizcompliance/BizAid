@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Compliance Score</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Your Compliance Score</h1>
+
+    <h3 id="bizName"></h3>
+
+    <h2 id="scoreDisplay"></h2>
+
+    <p id="message"></p>
+
+    <button onclick="window.location.href='payfast-subscribe.html'" 
+        style="margin-top:20px; background:#FF9800;">
+        Unlock Full Compliance Report – R49/month
+    </button>
+
+    <a href="index.html"><button>Check Again</button></a>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const score = urlParams.get("score");
+    const business = urlParams.get("business");
+
+    document.getElementById("scoreDisplay").innerText = score + "%";
+    document.getElementById("bizName").innerText = business ?? "";
+
+    let msg = "";
+
+    if(score >= 80){
+        msg = "Excellent! Your business is mostly compliant.";
+    }
+    else if(score >= 50){
+        msg = "Good, but some areas need attention.";
+    }
+    else {
+        msg = "You are at high compliance risk. Fixing your compliance is urgent.";
+    }
+
+    document.getElementById("message").innerText = msg;
+</script>
+
+</body>
+</html>
