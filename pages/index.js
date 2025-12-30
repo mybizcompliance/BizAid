@@ -1,17 +1,16 @@
-import Head from 'next/head'
-import AuthForm from '../components/AuthForm'
-
 export default function Home() {
   return (
-    <div style={{ padding: 24 }}>
-      <Head>
-        <title>MVP — Subscribe</title>
-      </Head>
+    <div style={{ padding: "40px", maxWidth: "600px", margin: "0 auto" }}>
+      <h1>BizAid</h1>
+      <p>
+        Welcome to BizAid. Check if your business is compliant in under 2 minutes.
+      </p>
 
-      <h1>Welcome</h1>
-      <p>Sign in with your email to access your dashboard.</p>
-
-      <AuthForm />
+      <a href="/compliance-check">
+        <button style={{ padding: "10px 20px", marginTop: "20px" }}>
+          Start Compliance Check
+        </button>
+      </a>
     </div>
-  )
+  );
 }
