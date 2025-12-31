@@ -10,9 +10,9 @@ export default function ComplianceCheck() {
   });
 
   const [showResults, setShowResults] = useState(false);
-
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field, value) => {
     setAnswers({ ...answers, [field]: value });
@@ -48,6 +48,33 @@ export default function ComplianceCheck() {
       : missing.push("Set up basic bookkeeping");
   }
 
+  const submitEmail = async () => {
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          answers,
+          compliant,
+          missing,
+        }),
+      });
+
+      if (res.ok) {
+        setEmailSubmitted(true);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      alert("Network error. Please try again.");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div style={{ padding: "40px", maxWidth: "600px", margin: "0 auto" }}>
       <h1>BizAid Compliance Check</h1>
@@ -55,113 +82,38 @@ export default function ComplianceCheck() {
 
       {!showResults && (
         <form onSubmit={handleSubmit}>
-          <p><strong>Are you registered with CIPC?</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="cipc"
-              value="yes"
-              onChange={() => handleChange("cipc", "yes")}
-              required
-            />{" "}
-            Yes
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              name="cipc"
-              value="no"
-              onChange={() => handleChange("cipc", "no")}
-            />{" "}
-            No
-          </label>
+          {[
+            ["cipc", "Are you registered with CIPC?"],
+            ["bank", "Do you have a business bank account?"],
+            ["sars", "Are you registered with SARS?"],
+            ["tax", "Do you submit tax returns (even nil returns)?"],
+            ["records", "Do you keep records of income & expenses?"],
+          ].map(([key, label]) => (
+            <div key={key}>
+              <p><strong>{label}</strong></p>
+              <label>
+                <input
+                  type="radio"
+                  name={key}
+                  value="yes"
+                  onChange={() => handleChange(key, "yes")}
+                  required
+                />{" "}
+                Yes
+              </label>{" "}
+              <label>
+                <input
+                  type="radio"
+                  name={key}
+                  value="no"
+                  onChange={() => handleChange(key, "no")}
+                />{" "}
+                No
+              </label>
+            </div>
+          ))}
 
-          <p><strong>Do you have a business bank account?</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="bank"
-              value="yes"
-              onChange={() => handleChange("bank", "yes")}
-              required
-            />{" "}
-            Yes
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              name="bank"
-              value="no"
-              onChange={() => handleChange("bank", "no")}
-            />{" "}
-            No
-          </label>
-
-          <p><strong>Are you registered with SARS?</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="sars"
-              value="yes"
-              onChange={() => handleChange("sars", "yes")}
-              required
-            />{" "}
-            Yes
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              name="sars"
-              value="no"
-              onChange={() => handleChange("sars", "no")}
-            />{" "}
-            No
-          </label>
-
-          <p><strong>Do you submit tax returns (even nil returns)?</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="tax"
-              value="yes"
-              onChange={() => handleChange("tax", "yes")}
-              required
-            />{" "}
-            Yes
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              name="tax"
-              value="no"
-              onChange={() => handleChange("tax", "no")}
-            />{" "}
-            No
-          </label>
-
-          <p><strong>Do you keep records of income & expenses?</strong></p>
-          <label>
-            <input
-              type="radio"
-              name="records"
-              value="yes"
-              onChange={() => handleChange("records", "yes")}
-              required
-            />{" "}
-            Yes
-          </label>{" "}
-          <label>
-            <input
-              type="radio"
-              name="records"
-              value="no"
-              onChange={() => handleChange("records", "no")}
-            />{" "}
-            No
-          </label>
-
-          <br /><br />
-
+          <br />
           <button type="submit" style={{ padding: "10px 20px" }}>
             Check My Compliance
           </button>
@@ -178,69 +130,39 @@ export default function ComplianceCheck() {
 
           <h3 style={{ color: "green" }}>✅ You are compliant with:</h3>
           <ul>
-            {compliant.length > 0 ? (
-              compliant.map((item, i) => <li key={i}>{item}</li>)
-            ) : (
-              <li>None yet</li>
-            )}
+            {compliant.length ? compliant.map((i, idx) => <li key={idx}>{i}</li>) : <li>None yet</li>}
           </ul>
 
           <h3 style={{ color: "red" }}>❌ You still need to:</h3>
           <ul>
-            {missing.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
+            {missing.map((i, idx) => <li key={idx}>{i}</li>)}
           </ul>
 
-          <div
-            style={{
-              border: "1px solid #ccc",
-              padding: "20px",
-              marginTop: "30px",
-            }}
-          >
-            <h3>Next step:</h3>
-            <p>
-              BizAid can guide you step-by-step to fix these items.
-            </p>
-
-            <hr style={{ margin: "20px 0" }} />
-
-            <h4>Get your compliance plan by email</h4>
-            <p>
-              Enter your email and BizAid will send you a personalised compliance plan.
-            </p>
+          <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "30px" }}>
+            <h3>Next step</h3>
+            <p>Get your personalised compliance plan by email.</p>
 
             <input
               type="email"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{
-                padding: "10px",
-                width: "100%",
-                maxWidth: "300px",
-                marginBottom: "10px",
-              }}
+              style={{ padding: "10px", width: "100%", maxWidth: "300px" }}
             />
 
-            <br />
+            <br /><br />
 
             <button
-              disabled={!email}
-              onClick={() => setEmailSubmitted(true)}
-              style={{
-                padding: "10px 20px",
-                opacity: email ? 1 : 0.5,
-                cursor: email ? "pointer" : "not-allowed",
-              }}
+              disabled={!email || loading}
+              onClick={submitEmail}
+              style={{ padding: "10px 20px" }}
             >
-              Get My Compliance Plan
+              {loading ? "Sending..." : "Get My Compliance Plan"}
             </button>
 
             {emailSubmitted && (
               <p style={{ color: "green", marginTop: "10px" }}>
-                ✅ Thanks! Your compliance plan will be sent to {email}.
+                ✅ Success! Check your email soon.
               </p>
             )}
           </div>
