@@ -1,122 +1,251 @@
 import { useState } from "react";
 
 export default function ComplianceCheck() {
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState({
+    cipc: "",
+    bank: "",
+    sars: "",
+    tax: "",
+    records: "",
+  });
 
-  function handleChange(question, value) {
-    setAnswers({ ...answers, [question]: value });
-  }
+  const [showResults, setShowResults] = useState(false);
 
-  function handleSubmit(e) {
+  const [email, setEmail] = useState("");
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+
+  const handleChange = (field, value) => {
+    setAnswers({ ...answers, [field]: value });
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("User answers:", answers);
-    alert("Compliance check submitted! (Results coming next)");
+    setShowResults(true);
+  };
+
+  const compliant = [];
+  const missing = [];
+
+  if (showResults) {
+    answers.cipc === "yes"
+      ? compliant.push("CIPC registration")
+      : missing.push("Register with CIPC");
+
+    answers.bank === "yes"
+      ? compliant.push("Business bank account")
+      : missing.push("Open a business bank account");
+
+    answers.sars === "yes"
+      ? compliant.push("SARS registration")
+      : missing.push("Register with SARS");
+
+    answers.tax === "yes"
+      ? compliant.push("Tax submissions")
+      : missing.push("Submit tax returns (even nil returns)");
+
+    answers.records === "yes"
+      ? compliant.push("Basic bookkeeping")
+      : missing.push("Set up basic bookkeeping");
   }
 
   return (
     <div style={{ padding: "40px", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Business Compliance Check</h1>
-      <p>
-        Answer a few quick questions to see if your business is compliant with
-        key South African requirements.
-      </p>
+      <h1>BizAid Compliance Check</h1>
+      <p>Answer a few questions to see if your business is compliant.</p>
 
-      <form onSubmit={handleSubmit}>
-        {/* Question 1 */}
-        <label>
-          <strong>Is your business officially registered?</strong>
-          <select
-            onChange={(e) =>
-              handleChange("registered", e.target.value)
-            }
-            required
+      {!showResults && (
+        <form onSubmit={handleSubmit}>
+          <p><strong>Are you registered with CIPC?</strong></p>
+          <label>
+            <input
+              type="radio"
+              name="cipc"
+              value="yes"
+              onChange={() => handleChange("cipc", "yes")}
+              required
+            />{" "}
+            Yes
+          </label>{" "}
+          <label>
+            <input
+              type="radio"
+              name="cipc"
+              value="no"
+              onChange={() => handleChange("cipc", "no")}
+            />{" "}
+            No
+          </label>
+
+          <p><strong>Do you have a business bank account?</strong></p>
+          <label>
+            <input
+              type="radio"
+              name="bank"
+              value="yes"
+              onChange={() => handleChange("bank", "yes")}
+              required
+            />{" "}
+            Yes
+          </label>{" "}
+          <label>
+            <input
+              type="radio"
+              name="bank"
+              value="no"
+              onChange={() => handleChange("bank", "no")}
+            />{" "}
+            No
+          </label>
+
+          <p><strong>Are you registered with SARS?</strong></p>
+          <label>
+            <input
+              type="radio"
+              name="sars"
+              value="yes"
+              onChange={() => handleChange("sars", "yes")}
+              required
+            />{" "}
+            Yes
+          </label>{" "}
+          <label>
+            <input
+              type="radio"
+              name="sars"
+              value="no"
+              onChange={() => handleChange("sars", "no")}
+            />{" "}
+            No
+          </label>
+
+          <p><strong>Do you submit tax returns (even nil returns)?</strong></p>
+          <label>
+            <input
+              type="radio"
+              name="tax"
+              value="yes"
+              onChange={() => handleChange("tax", "yes")}
+              required
+            />{" "}
+            Yes
+          </label>{" "}
+          <label>
+            <input
+              type="radio"
+              name="tax"
+              value="no"
+              onChange={() => handleChange("tax", "no")}
+            />{" "}
+            No
+          </label>
+
+          <p><strong>Do you keep records of income & expenses?</strong></p>
+          <label>
+            <input
+              type="radio"
+              name="records"
+              value="yes"
+              onChange={() => handleChange("records", "yes")}
+              required
+            />{" "}
+            Yes
+          </label>{" "}
+          <label>
+            <input
+              type="radio"
+              name="records"
+              value="no"
+              onChange={() => handleChange("records", "no")}
+            />{" "}
+            No
+          </label>
+
+          <br /><br />
+
+          <button type="submit" style={{ padding: "10px 20px" }}>
+            Check My Compliance
+          </button>
+        </form>
+      )}
+
+      {showResults && (
+        <div>
+          <h2>
+            {missing.length === 0
+              ? "🎉 You are compliant"
+              : "❌ You are not compliant yet"}
+          </h2>
+
+          <h3 style={{ color: "green" }}>✅ You are compliant with:</h3>
+          <ul>
+            {compliant.length > 0 ? (
+              compliant.map((item, i) => <li key={i}>{item}</li>)
+            ) : (
+              <li>None yet</li>
+            )}
+          </ul>
+
+          <h3 style={{ color: "red" }}>❌ You still need to:</h3>
+          <ul>
+            {missing.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+
+          <div
+            style={{
+              border: "1px solid #ccc",
+              padding: "20px",
+              marginTop: "30px",
+            }}
           >
-            <option value="">Select one</option>
-            <option value="yes">Yes, fully registered</option>
-            <option value="no">No, not registered</option>
-            <option value="progress">Registration in progress</option>
-          </select>
-        </label>
+            <h3>Next step:</h3>
+            <p>
+              BizAid can guide you step-by-step to fix these items.
+            </p>
 
-        <br /><br />
+            <hr style={{ margin: "20px 0" }} />
 
-        {/* Question 2 */}
-        <label>
-          <strong>What type of business do you operate?</strong>
-          <select
-            onChange={(e) =>
-              handleChange("businessType", e.target.value)
-            }
-            required
-          >
-            <option value="">Select one</option>
-            <option value="sole">Sole Proprietor</option>
-            <option value="pty">Private Company (Pty Ltd)</option>
-            <option value="partnership">Partnership</option>
-            <option value="npo">Non-Profit Organisation</option>
-            <option value="unsure">Not sure</option>
-          </select>
-        </label>
+            <h4>Get your compliance plan by email</h4>
+            <p>
+              Enter your email and BizAid will send you a personalised compliance plan.
+            </p>
 
-        <br /><br />
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{
+                padding: "10px",
+                width: "100%",
+                maxWidth: "300px",
+                marginBottom: "10px",
+              }}
+            />
 
-        {/* Question 3 */}
-        <label>
-          <strong>Do you have employees?</strong>
-          <select
-            onChange={(e) =>
-              handleChange("employees", e.target.value)
-            }
-            required
-          >
-            <option value="">Select one</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </label>
+            <br />
 
-        <br /><br />
+            <button
+              disabled={!email}
+              onClick={() => setEmailSubmitted(true)}
+              style={{
+                padding: "10px 20px",
+                opacity: email ? 1 : 0.5,
+                cursor: email ? "pointer" : "not-allowed",
+              }}
+            >
+              Get My Compliance Plan
+            </button>
 
-        {/* Question 4 */}
-        <label>
-          <strong>Is your business registered with SARS?</strong>
-          <select
-            onChange={(e) =>
-              handleChange("sars", e.target.value)
-            }
-            required
-          >
-            <option value="">Select one</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-            <option value="unsure">Not sure</option>
-          </select>
-        </label>
-
-        <br /><br />
-
-        {/* Question 5 */}
-        <label>
-          <strong>Do you submit your tax returns on time?</strong>
-          <select
-            onChange={(e) =>
-              handleChange("taxReturns", e.target.value)
-            }
-            required
-          >
-            <option value="">Select one</option>
-            <option value="yes">Yes, always</option>
-            <option value="sometimes">Sometimes late</option>
-            <option value="no">No</option>
-          </select>
-        </label>
-
-        <br /><br />
-
-        <button type="submit">
-          View My Compliance Results
-        </button>
-      </form>
+            {emailSubmitted && (
+              <p style={{ color: "green", marginTop: "10px" }}>
+                ✅ Thanks! Your compliance plan will be sent to {email}.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
